@@ -2,7 +2,7 @@
 
 ```
     cd /opt/observium/html 
-    git clone https://github.com/tobzsc/weathermap-for-observium.git weathermap
+    git clone https://github.com/ZerxXxes/weathermap-for-observium.git weathermap
 ```
 
 2. Edit data-pick.php and make sure the variables at the start are all ok.
