@@ -50,10 +50,15 @@ if (isset($options['d']))
 }
 
 
-include("../../includes/defaults.inc.php");
-include("../../config.php");
-include("../../includes/functions.inc.php");
-include("../../includes/definitions.inc.php");
+if (is_file("../../includes/sql-config.inc.php")) {
+	// For new versions
+	include("../../includes/sql-config.inc.php");
+} else {
+	include("../../includes/defaults.inc.php");
+	include("../../config.php");
+	include("../../includes/functions.inc.php");
+	include("../../includes/definitions.inc.php");
+}
 include("../../includes/polling/functions.inc.php");
 
 $cli = TRUE;
