@@ -78,17 +78,17 @@ class WeatherMapDataSource
 	{
 		return(array(-1,-1));
 	}
-	
+
 	// pre-register a target + context, to allow a plugin to batch up queries to a slow database, or snmp for example
 	function Register($targetstring, &$map, &$item)
 	{
-	
+
 	}
-	
+
 	// called before ReadData, to allow plugins to DO the prefetch of targets known from Register
 	function Prefetch()
 	{
-		
+
 	}
 }
 
@@ -255,7 +255,7 @@ class WeatherMap extends WeatherMapBase
 	var $node_template_tree;
 	var $link_template_tree;
     var $dsinfocache=array();
-	
+
 	var $plugins = array();
 	var $included_files = array();
 	var $usage_stats = array();
@@ -299,14 +299,14 @@ class WeatherMap extends WeatherMapBase
 				'timefont' => 2,
 				'timex' => 0,
 				'timey' => 0,
-				
+
 				'mintimex' => -10000,
 				'mintimey' => -10000,
 				'maxtimex' => -10000,
 				'maxtimey' => -10000,
 				'minstamptext' => 'Oldest Data: %b %d %Y %H:%M:%S',
 				'maxstamptext' => 'Newest Data: %b %d %Y %H:%M:%S',
-				
+
 				'thumb_width' => 0,
 				'thumb_height' => 0,
 				'titlex' => -1,
@@ -318,19 +318,19 @@ class WeatherMap extends WeatherMapBase
 				'widthmod' => FALSE,
 				'has_includes' => FALSE,
 				'has_overlibs' => FALSE,
-				'name' => 'MAP'				
+				'name' => 'MAP'
 			);
 
 		$this->Reset();
 	}
 
 	function my_type() {  return "MAP"; }
-	
+
 	function Reset()
 	{
 		$this->next_id = 100;
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
-		
+
 		$this->min_ds_time = NULL;
 		$this->max_ds_time = NULL;
 
@@ -338,7 +338,7 @@ class WeatherMap extends WeatherMapBase
 
 		$this->nodes=array(); // an array of WeatherMapNodes
 		$this->links=array(); // an array of WeatherMapLinks
-		
+
 		// these are the default defaults
                 // by putting them into a normal object, we can use the
                 // same code for writing out LINK DEFAULT as any other link.
@@ -348,7 +348,7 @@ class WeatherMap extends WeatherMapBase
                 $deflink->name=":: DEFAULT ::";
                 $deflink->template=":: DEFAULT ::";
                 $deflink->Reset($this);
-               
+
                 $this->links[':: DEFAULT ::'] = &$deflink;
 
                 wm_debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
@@ -356,12 +356,12 @@ class WeatherMap extends WeatherMapBase
                 $defnode->name=":: DEFAULT ::";
                 $defnode->template=":: DEFAULT ::";
                 $defnode->Reset($this);
-               
+
                 $this->nodes[':: DEFAULT ::'] = &$defnode;
-                
+
        	$this->node_template_tree = array();
        	$this->link_template_tree = array();
-       	
+
 		$this->node_template_tree['DEFAULT'] = array();
 		$this->link_template_tree['DEFAULT'] = array();
 
@@ -374,7 +374,7 @@ class WeatherMap extends WeatherMapBase
                 $defnode2->name = "DEFAULT";
                 $defnode2->template = ":: DEFAULT ::";
                 $defnode2->Reset($this);
-		
+
                 $this->nodes['DEFAULT'] = &$defnode2;
 
 		wm_debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
@@ -382,7 +382,7 @@ class WeatherMap extends WeatherMapBase
                 $deflink2->name = "DEFAULT";
                 $deflink2->template = ":: DEFAULT ::";
                 $deflink2->Reset($this);
-		
+
                 $this->links['DEFAULT'] = &$deflink2;
 
 // for now, make the old defaultlink and defaultnode work too.
@@ -474,7 +474,7 @@ class WeatherMap extends WeatherMapBase
 	function myimagestringsize($fontnumber, $string)
 	{
 		$linecount = 1;
-		
+
 		$lines = explode("\n",$string);
 		$linecount = sizeof($lines);
 		$maxlinelength=0;
@@ -483,7 +483,7 @@ class WeatherMap extends WeatherMapBase
 			$l = strlen($line);
 			if($l > $maxlinelength) $maxlinelength = $l;
 		}
-				
+
 		if (($fontnumber > 0) && ($fontnumber < 6))
 		{ return array(imagefontwidth($fontnumber) * $maxlinelength, $linecount * imagefontheight($fontnumber)); }
 		else
@@ -514,7 +514,7 @@ class WeatherMap extends WeatherMapBase
 					#	$string);
 					# return (array($bounds[4] - $bounds[0], $bounds[1] - $bounds[5]));
 					# warn("Size of $string is $xsize x $ysize over $linecount lines\n");
-					
+
 					return(array($xsize,$ysize));
 				}
 
@@ -532,7 +532,7 @@ class WeatherMap extends WeatherMapBase
 		assert('is_scalar($input)');
 
 		$context_description = strtolower( $context->my_type() );
-		if($context_description != "map") $context_description .= ":" . $context->name; 
+		if($context_description != "map") $context_description .= ":" . $context->name;
 
 		wm_debug("Trace: ProcessString($input, $context_description)\n");
 
@@ -544,7 +544,7 @@ class WeatherMap extends WeatherMapBase
 		}
 
 		$output = $input;
-		
+
 		# while( preg_match("/(\{[^}]+\})/",$input,$matches) )
 		while( preg_match("/(\{(?:node|map|link)[^}]+\})/",$input,$matches) )
 		{
@@ -591,7 +591,7 @@ class WeatherMap extends WeatherMapBase
 							{
 								$the_item = $context->a;
 							}
-							
+
 							if($itemname == '_linkend_')
 							{
 								$the_item = $context->b;
@@ -685,7 +685,7 @@ function RandomData()
 function LoadPlugins( $type="data", $dir="lib/datasources" )
 {
 	wm_debug("Beginning to load $type plugins from $dir\n");
-        
+
     if ( ! file_exists($dir)) {
         $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
         wm_debug("Relative path didn't exist. Trying $dir\n");
@@ -762,33 +762,34 @@ function DatasourceInit()
 			# unset($this->datasourceclasses[$ds_class]);
 		}
 	}
-	wm_debug("Finished Initialising Plugins...\n");	
+	wm_debug("Finished Initialising Plugins...\n");
 }
 
 function ProcessTargets()
 {
 	wm_debug("Preprocessing targets\n");
-	
+
 	$allitems = array(&$this->links, &$this->nodes);
 	reset($allitems);
-	
+
 	wm_debug("Preprocessing targets\n");
-	
-	while( list($kk,) = each($allitems))
+//	while( list($kk,) = each($allitems))
+  foreach (array_keys($allitems) as $kk)
 	{
 		unset($objects);
 		$objects = &$allitems[$kk];
 
 		reset($objects);
-		while (list($k,) = each($objects))
+		// while (list($k,) = each($objects))
+    foreach (array_keys($objects) as $k)
 		{
 			unset($myobj);
 			$myobj = &$objects[$k];
-			
+
 			$type = $myobj->my_type();
 			$name=$myobj->name;
-			
-			
+
+
 			if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
 			{
 				if (count($myobj->targets)>0)
@@ -798,7 +799,7 @@ function ProcessTargets()
 					{
 						wm_debug ("ProcessTargets: New Target: $target[4]\n");
 						// processstring won't use notes (only hints) for this string
-						
+
 						$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
 						if($target[4] != $targetstring) wm_debug("Targetstring is now $targetstring\n");
 
@@ -809,14 +810,14 @@ function ProcessTargets()
 							$targetstring = $matches[1];
 							$multiply = -1 * $multiply;
 						}
-						
+
 						// if the remaining targetstring starts with a number and a *-, then this is a scale factor
 						if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
 						{
 							$targetstring = $matches[2];
 							$multiply = $multiply * floatval($matches[1]);
 						}
-						
+
 						$matched = FALSE;
 						$matched_by = '';
 						foreach ($this->datasourceclasses as $ds_class)
@@ -827,10 +828,10 @@ function ProcessTargets()
 								$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
 
 								if( $recognised )
-								{	
+								{
 									$matched = TRUE;
 									$matched_by = $ds_class;
-																		
+
 									if($this->activedatasourceclasses[$ds_class])
 									{
 										$this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
@@ -845,7 +846,7 @@ function ProcessTargets()
 											$this->links[$name]->targets[$tindex][1] = $multiply;
 											$this->links[$name]->targets[$tindex][0] = $targetstring;
 											$this->links[$name]->targets[$tindex][5] = $matched_by;
-										}											
+										}
 									}
 									else
 									{
@@ -857,8 +858,8 @@ function ProcessTargets()
 						if(! $matched)
 						{
 							wm_warn("ProcessTargets: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
-						}							
-						
+						}
+
 						$tindex++;
 					}
 				}
@@ -878,27 +879,29 @@ function ReadData()
 	if ($this->sizedebug == 0)
 	{
 		$this->ProcessTargets();
-				
+
 		wm_debug ("======================================\n");
 		wm_debug("Starting prefetch\n");
 		foreach ($this->datasourceclasses as $ds_class)
 		{
 			$this->plugins['data'][$ds_class]->Prefetch();
 		}
-		
+
 		wm_debug ("======================================\n");
 		wm_debug("Starting main collection loop\n");
-		
+
 		$allitems = array(&$this->links, &$this->nodes);
 		reset($allitems);
-		
-		while( list($kk,) = each($allitems))
+
+		// while( list($kk,) = each($allitems))
+    foreach (array_keys($allitems) as $kk)
 		{
 			unset($objects);
 			$objects = &$allitems[$kk];
 
 			reset($objects);
-			while (list($k,) = each($objects))
+			// while (list($k,) = each($objects))
+      foreach (array_keys($objects) as $k)
 			{
 				unset($myobj);
 				$myobj = &$objects[$k];
@@ -920,29 +923,29 @@ function ReadData()
 						{
 							wm_debug ("ReadData: New Target: $target[4]\n");
 	#						debug ( var_dump($target));
-	
+
 							$targetstring = $target[0];
 							$multiply = $target[1];
-							
+
 	#						exit();
-							
+
 							$in = 0;
 							$out = 0;
 							$datatime = 0;
 							if ($target[4] != '')
 							{
 								// processstring won't use notes (only hints) for this string
-								
+
 								$targetstring = $this->ProcessString($target[0], $myobj, FALSE, FALSE);
-								if($target[0] != $targetstring) wm_debug("Targetstring is now $targetstring\n");							
+								if($target[0] != $targetstring) wm_debug("Targetstring is now $targetstring\n");
 								if($multiply != 1) wm_debug("Will multiply result by $multiply\n");
-																
+
 								if($target[0] != "")
 								{
 									$matched_by = $target[5];
 									list($in,$out,$datatime) =  $this->plugins['data'][ $target[5] ]->ReadData($targetstring, $this, $myobj);
 								}
-	
+
 								if (($in === NULL) && ($out === NULL))
 								{
 									$in=0;
@@ -955,16 +958,16 @@ function ReadData()
 									if($in === NULL) $in = 0;
 									if($out === NULL) $out = 0;
 								}
-	
-								if($multiply != 1) {  
-									wm_debug("Pre-multiply: $in $out\n"); 
-								
+
+								if($multiply != 1) {
+									wm_debug("Pre-multiply: $in $out\n");
+
 									$in = $multiply*$in;
 									$out = $multiply*$out;
-								
-									wm_debug("Post-multiply: $in $out\n"); 
+
+									wm_debug("Post-multiply: $in $out\n");
 								}
-								
+
 								$total_in=$total_in + $in;
 								$total_out=$total_out + $out;
 								wm_debug("Aggregate so far: $total_in $total_out\n");
@@ -973,14 +976,14 @@ function ReadData()
 								{
 									if($this->max_data_time==NULL || $datatime > $this->max_data_time) $this->max_data_time = $datatime;
 									if($this->min_data_time==NULL || $datatime < $this->min_data_time) $this->min_data_time = $datatime;
-									
+
 									wm_debug("DataTime MINMAX: ".$this->min_data_time." -> ".$this->max_data_time."\n");
 								}
-								
+
 							}
 							$tindex++;
 						}
-	
+
 						wm_debug ("ReadData complete for $type $name: $total_in $total_out\n");
 					}
 					else
@@ -1033,16 +1036,16 @@ function ReadData()
 					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->bandwidth_in,$myobj->usescale,$myobj->name, FALSE, $warn_in);
 					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->bandwidth_out,$myobj->usescale,$myobj->name, FALSE, $warn_out);
 				}
-				
+
 				$myobj->add_note("inscalekey",$inscalekey);
 				$myobj->add_note("outscalekey",$outscalekey);
-				
+
 				$myobj->add_note("inscaletag",$inscaletag);
 				$myobj->add_note("outscaletag",$outscaletag);
-				
+
 				$myobj->add_note("inscalecolor",$incol->as_html());
 				$myobj->add_note("outscalecolor",$outcol->as_html());
-				
+
 				$myobj->colours[IN] = $incol;
 				$myobj->colours[OUT] = $outcol;
 
@@ -1108,7 +1111,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
 	$areaname = "LINK:L".$map->links[$linkname]->id.':'.($direction+2);
-	
+
 	// the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
 	if($angle==0)
 	{
@@ -1127,7 +1130,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 {
 	$col = NULL;
 	$tag = '';
-	
+
 	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
 	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
 
@@ -1218,7 +1221,7 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 
 	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
 	$nowarn_scalemisses = (!$scale_warning) || intval($this->get_hint("nowarn_scalemisses"));
-	
+
 	if(isset($this->colours[$scalename]))
 	{
 		$colours=$this->colours[$scalename];
@@ -1228,7 +1231,7 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 			if($nowarn_clipping==0) wm_warn ("NewColourFromPercent: Clipped $value% to 100% for item $name [WMWARN33]\n");
 			$value = 100;
 		}
-		
+
 		if ($is_percent && $value < 0)
 		{
 			if($nowarn_clipping==0) wm_warn ("NewColourFromPercent: Clipped $value% to 0% for item $name [WMWARN34]\n");
@@ -1263,14 +1266,14 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 					# $col = new Colour($r, $g, $b);
 					# $col = $colour['gdref1'];
 				}
-				
+
 				// change in behaviour - with multiple matching ranges for a value, the smallest range wins
-				if( is_null($matchsize) || ($range < $matchsize) ) 
+				if( is_null($matchsize) || ($range < $matchsize) )
 				{
 					$col = new Colour($r, $g, $b);
 					$matchsize = $range;
 				}
-				
+
 				if(isset($colour['tag'])) $tag = $colour['tag'];
 				#### warn(">>NCFPC TAGS $tag\n");
 				wm_debug("NCFPC $name $scalename $value '$tag' $key $r $g $b\n");
@@ -1321,7 +1324,7 @@ function FindScaleExtent($scalename="DEFAULT")
 {
 	$max = -999999999999999999999;
 	$min = - $max;
-	
+
 	if(isset($this->colours[$scalename]))
 	{
 		$colours=$this->colours[$scalename];
@@ -1472,7 +1475,7 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 
 	$updown = 1;
 	if($inverted) $updown = -1;
-		
+
 
 	for($p=0;$p<=100;$p++)
 	{
@@ -1484,7 +1487,7 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 		{
 			$dy = $p*$scalefactor;
 		}
-	
+
 		if( ($p % 25) == 0)
 		{
 			imageline($scale_im, $scale_left - $scalefactor, $scale_top + $dy,
@@ -1520,7 +1523,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 
 	$colours=$this->colours[$scalename];
 	usort($colours, array("Weathermap", "coloursort"));
-	
+
 	$nscales=$this->numscales[$scalename];
 
 	wm_debug("Drawing $nscales colours into SCALE\n");
@@ -1553,7 +1556,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 		list($minwidth, $junk)=$this->myimagestringsize($font, 'MMMM 100%-100%');
 		list($minminwidth, $junk)=$this->myimagestringsize($font, 'MMMM ');
 		list($boxwidth, $junk)=$this->myimagestringsize($font, $title);
-		
+
 		if($use_tags)
 		{
 			$max_tag = 0;
@@ -1566,7 +1569,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 					if($w > $max_tag) $max_tag = $w;
 				}
 			}
-			
+
 			// now we can tweak the widths, appropriately to allow for the tag strings
 			# print "$max_tag > $minwidth?\n";
 			if( ($max_tag + $minminwidth) > $minwidth) $minwidth = $minminwidth + $max_tag;
@@ -1610,7 +1613,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 				// pick a value in the middle...
 				$value = ($colour['bottom'] + $colour['top']) / 2;
 				wm_debug(sprintf("%f-%f (%f)  %d %d %d\n", $colour['bottom'], $colour['top'], $value, $colour['red1'], $colour['green1'], $colour['blue1']));
-				
+
 				#  debug("$i: drawing\n");
 				if( ($hide_zero == 0) || $colour['key'] != '0_0')
 				{
@@ -1659,7 +1662,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 						$labelstring=sprintf("%s-%s", $colour['bottom'], $colour['top']);
 						if($hide_percent==0) { $labelstring.="%"; }
 					}
-										
+
 					$this->myimagestring($scale_im, $font, $x + 4 + $tilewidth, $y + $tileheight, $labelstring,
 						$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 					$i++;
@@ -1695,14 +1698,14 @@ function DrawTimestamp($im, $font, $colour, $which="")
 			$stamp = strftime($this->maxstamptext, $this->max_data_time);
 			$pos_x = $this->maxtimex;
 			$pos_y = $this->maxtimey;
-			break;	
+			break;
 		default:
 			$stamp = $this->datestamp;
 			$pos_x = $this->timex;
 			$pos_y = $this->timey;
 			break;
 	}
-		
+
 	list($boxwidth, $boxheight)=$this->myimagestringsize($font, $stamp);
 
 	$x=$this->width - $boxwidth;
@@ -1713,7 +1716,7 @@ function DrawTimestamp($im, $font, $colour, $which="")
 		$x = $pos_x;
 		$y = $pos_y;
 	}
-		
+
 	$this->myimagestring($im, $font, $x, $y, $stamp, $colour);
 	$this->imap->addArea("Rectangle", $which."TIMESTAMP", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 }
@@ -1721,7 +1724,7 @@ function DrawTimestamp($im, $font, $colour, $which="")
 function DrawTitle($im, $font, $colour)
 {
 	$string = $this->ProcessString($this->title,$this);
-	
+
 	if($this->get_hint('screenshot_mode')==1)  $string= screenshotify($string);
 
 	list($boxwidth, $boxheight)=$this->myimagestringsize($font, $string);
@@ -1758,7 +1761,7 @@ function ReadConfig($input, $is_include=FALSE)
 	// if it isn't, it's the filename
 
 	$lines = array();
-	
+
 	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
 	{
 		 wm_debug("ReadConfig Detected that this is a config fragment.\n");
@@ -1771,8 +1774,8 @@ function ReadConfig($input, $is_include=FALSE)
 	{
 		wm_debug("ReadConfig Detected that this is a config filename.\n");
 		 $filename = $input;
-		 
-		if($is_include){ 
+
+		if($is_include){
 			wm_debug("ReadConfig Detected that this is an INCLUDED config filename.\n");
 			if($is_include && in_array($filename, $this->included_files))
 			{
@@ -1785,9 +1788,9 @@ function ReadConfig($input, $is_include=FALSE)
 				$this->has_includes = TRUE;
 			}
 		}
-		
+
 		$fd=fopen($filename, "r");
-		 
+
 		if ($fd)
 		{
 				while (!feof($fd))
@@ -1800,7 +1803,7 @@ function ReadConfig($input, $is_include=FALSE)
 				fclose($fd);
 		}
 	}
-		
+
 	$linecount = 0;
 	$objectlinecount = 0;
 
@@ -1808,21 +1811,21 @@ function ReadConfig($input, $is_include=FALSE)
 	{
 		$linematched=0;
 		$linecount++;
-		
+
 		if (preg_match("/^\s*#/", $buffer)) {
 			// this is a comment line
 		}
 		else
 		{
-			$buffer = trim($buffer);	
-			
+			$buffer = trim($buffer);
+
 			// for any other config elements that are shared between nodes and links, they can use this
 			unset($curobj);
 			$curobj = NULL;
 			if($last_seen == "LINK") $curobj = &$curlink;
 			if($last_seen == "NODE") $curobj = &$curnode;
 			if($last_seen == "GLOBAL") $curobj = &$this;
-			
+
 			$objectlinecount++;
 
 			#if (preg_match("/^\s*(LINK|NODE)\s+([A-Za-z][A-Za-z0-9_\.\-\:]*)\s*$/i", $buffer, $matches))
@@ -1840,7 +1843,7 @@ function ReadConfig($input, $is_include=FALSE)
 					{
 						$this->nodes[$curnode->name]=$curnode;
 						if($curnode->template == 'DEFAULT') $this->node_template_tree[ "DEFAULT" ][]= $curnode->name;
-					
+
 						wm_debug ("Saving Node: " . $curnode->name . "\n");
 					}
 
@@ -1856,7 +1859,7 @@ function ReadConfig($input, $is_include=FALSE)
 							$this->links[$curlink->name]=$curlink;
 							wm_debug ("Saving Template-Only Link: " . $curlink->name . "\n");
 						}
-						if($curlink->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curlink->name;				
+						if($curlink->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curlink->name;
 					}
 				}
 
@@ -1879,12 +1882,12 @@ function ReadConfig($input, $is_include=FALSE)
 						{
 							wm_warn("Duplicate link name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN25]\n");
 						}
-						
+
 						wm_debug("New LINK ".$matches[2]."\n");
 						$curlink=new WeatherMapLink;
 						$curlink->name=$matches[2];
 						$curlink->Reset($this);
-										
+
 						$linksseen++;
 					}
 
@@ -1918,7 +1921,7 @@ function ReadConfig($input, $is_include=FALSE)
 						$curnode=new WeatherMapNode;
 						$curnode->name=$matches[2];
 						$curnode->Reset($this);
-						
+
 						$nodesseen++;
 					}
 
@@ -1927,7 +1930,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$linematched++;
 					$curobj = &$curnode;
 				}
-				
+
 				# record where we first heard about this object
 				$curobj->defined_in = $filename;
 			}
@@ -1979,16 +1982,16 @@ function ReadConfig($input, $is_include=FALSE)
 					array('LINK', '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s+(absolute|percent)\s*$/i', array('usescale'=>1,'scaletype'=>2)),
 
 					array('LINK', '/^\s*SPLITPOS\s+(\d+)\s*$/i', array('splitpos'=>1)),
-					
+
 					array('NODE', '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', array('labeloffsetx'=>1,'labeloffsety'=>2)),
 					array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
                                         array('NODE', '/^\s*LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i', array('labeloffset'=>1)),
                                         array('NODE', '/^\s*LABELOFFSET\s+(-?\d+r\d+)\s*$/i', array('labeloffset'=>1)),
-                            
+
 					array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
 					array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
-					# array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),						
-					
+					# array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),
+
 					array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
 					array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
 					# array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
@@ -1996,22 +1999,22 @@ function ReadConfig($input, $is_include=FALSE)
 					array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
 					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
 					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
-					
+
 					array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
 					array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
 					array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1)),
 					array('LINK','/^\s*OUTNOTES\s+(.*)\s*$/i',array('notestext[OUT]'=>1)),
-					
+
 					array('NODE','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
 					array('LINK','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
 					array('LINK','/^\s*ININFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1)),
 					array('LINK','/^\s*OUTINFOURL\s+(.*)\s*$/i',array('infourl[OUT]'=>1)),
-					
+
 					array('NODE','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
 					array('LINK','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
 					array('LINK','/^\s*INOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1)),
 					array('LINK','/^\s*OUTOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[OUT]'=>1)),
-											
+
 					array('(NODE|LINK)', "/^\s*ZORDER\s+([-+]?\d+)\s*$/i", array('zorder'=>1)),
 					array('(NODE|LINK)', "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i", array('overlibwidth'=>1)),
 					array('(NODE|LINK)', "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", array('overlibheight'=>1)),
@@ -2023,7 +2026,7 @@ function ReadConfig($input, $is_include=FALSE)
 			// alternative for use later where quoted strings are more useful
 			$args = wm_parse_string($buffer);
 
-			// this loop replaces a whole pile of duplicated ifs with something with consistent handling 
+			// this loop replaces a whole pile of duplicated ifs with something with consistent handling
 			foreach ($config_keywords as $keyword)
 			{
 				if(preg_match("/".$keyword[0]."/",$last_seen))
@@ -2031,13 +2034,13 @@ function ReadConfig($input, $is_include=FALSE)
 					$statskey = $last_seen."-".$keyword[1];
 					$statskey = str_replace( array('/^\s*','\s*$/i'),array('',''), $statskey);
 					if(!isset($this->usage_stats[$statskey])) $this->usage_stats[$statskey] = 0;
-					
+
 					if(preg_match($keyword[1],$buffer,$matches))
 					{
 						# print "CONFIG MATCHED: ".$keyword[1]."\n";
-						
+
 						$this->usage_stats[$statskey]++;
-						
+
 						foreach ($keyword[2] as $key=>$val)
 						{
 							// so we can poke in numbers too, if the value starts with #
@@ -2045,16 +2048,16 @@ function ReadConfig($input, $is_include=FALSE)
 							if(preg_match("/^#(.*)/",$val,$m))
 							{
 								$val = $m[1];
-							}	
-							elseif(is_numeric($val)) 
+							}
+							elseif(is_numeric($val))
 							{
 								// if it's a number, then it;s a match number,
 								// otherwise it's a literal to be put into a variable
 								$val = $matches[$val];
 							}
-							
+
 							assert('is_object($curobj)');
-							
+
 							if(preg_match('/^(.*)\[([^\]]+)\]$/',$key,$m))
 							{
 								$index = constant($m[2]);
@@ -2091,7 +2094,7 @@ function ReadConfig($input, $is_include=FALSE)
 							$nodenames[$i]=preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i", '', $matches[$i]);
 							$this->need_size_precalc=TRUE;
 						}
-						
+
 						if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i], $submatches))
 						{
 							$endoffset[$i]=$submatches[1];
@@ -2121,7 +2124,7 @@ function ReadConfig($input, $is_include=FALSE)
 							$valid_nodes--;
 						}
 					}
-					
+
 					// TODO - really, this should kill the whole link, and reset for the next one
 					if ($valid_nodes == 2)
 					{
@@ -2143,25 +2146,25 @@ function ReadConfig($input, $is_include=FALSE)
 				if(file_exists($matches[1])){
 					wm_debug("Including '{$matches[1]}'\n");
 					$this->ReadConfig($matches[1], TRUE);
-					$last_seen = "GLOBAL";				
+					$last_seen = "GLOBAL";
 				}else{
 					wm_warn("INCLUDE File '{$matches[1]}' not found!\n");
 				}
 				$linematched++;
 			}
-			
+
 			if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches))
 			{
 				$linematched++;
 				# $targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
 				$rawtargetlist = $matches[1]." ";
-							
+
 				if($args[0]=='TARGET')
 				{
 					// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
 					$curobj->targets = array();
 					array_shift($args); // take off the actual TARGET keyword
-					
+
 					foreach($args as $arg)
 					{
 						// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
@@ -2172,7 +2175,7 @@ function ReadConfig($input, $is_include=FALSE)
 						// 2 => config filename where this line appears
 						// 3 => linenumber in that file
 						// 4 => the original target string
-						// 5 => the plugin to use to pull data 
+						// 5 => the plugin to use to pull data
 						$newtarget=array('','',$filename,$linecount,$arg,"","");
 						if ($curobj)
 						{
@@ -2182,7 +2185,7 @@ function ReadConfig($input, $is_include=FALSE)
 					}
 				}
 			}
-			
+
 			if ($last_seen == 'LINK' && preg_match(
 				"/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i", $buffer,
 				$matches))
@@ -2210,38 +2213,38 @@ function ReadConfig($input, $is_include=FALSE)
 				$curobj->bwlabelformats[IN] = $format_in;
 				$curobj->bwlabelformats[OUT] = $format_out;
 				$linematched++;
-			}			
-			
+			}
+
 			if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
 			{
 					$curobj->add_hint($matches[1],trim($matches[2]));
-					
+
 					if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
 						$weathermap_error_suppress[$matches[1]] = 1;
 					}
-					
+
 					$linematched++;
-			}				
+			}
 
 			// allow setting a variable to ""
 			if (preg_match("/^\s*SET\s+(\S+)\s*$/i", $buffer, $matches))
 			{
 					$curobj->add_hint($matches[1],'');
-					
+
 					if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
 						$weathermap_error_suppress[$matches[1]] = 1;
 					}
-					
+
 					$linematched++;
-			}				
-			
+			}
+
 			if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
 			{
 				$this->has_overlibs = TRUE;
 				if($last_seen == 'NODE' && $matches[1] != '') {
 						wm_warn("IN/OUTOVERLIBGRAPH make no sense for a NODE! [WMWARN42]\n");
 					} else if($last_seen == 'LINK' || $last_seen=='NODE' ) {
-				
+
 						$urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
 
 						if($matches[1] == 'IN') $index = IN;
@@ -2254,10 +2257,10 @@ function ReadConfig($input, $is_include=FALSE)
 						}
 						$linematched++;
 					}
-			}			
-		
+			}
+
 			// array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),
-				
+
 			if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TEMPLATE\s+(\S+)\s*$/i", $buffer, $matches))
 			{
 				$tname = $matches[1];
@@ -2268,7 +2271,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$curobj->Reset($this);
 					if( $objectlinecount > 1 ) wm_warn("line $linecount: TEMPLATE is not first line of object. Some data may be lost. [WMWARN39]\n");
 					// build up a list of templates - this will be useful later for the tree view
-					
+
 					if($last_seen == 'NODE') $this->node_template_tree[ $tname ][]= $curobj->name;
 					if($last_seen == 'LINK') $this->link_template_tree[ $tname ][]= $curobj->name;
 				}
@@ -2276,8 +2279,8 @@ function ReadConfig($input, $is_include=FALSE)
 				{
 					wm_warn("line $linecount: $last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
 				}
-				$linematched++;	
-				
+				$linematched++;
+
 			}
 
 			if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
@@ -2322,7 +2325,7 @@ function ReadConfig($input, $is_include=FALSE)
 						$varname = 'iconscalevar';
 						$uvarname = 'useiconscale';
 						$tvarname = 'iconscaletype';
-						
+
 						// if(!function_exists("imagefilter"))
 						// {
 						// 	warn("ICON SCALEs require imagefilter, which is not present in your PHP [WMWARN040]\n");
@@ -2363,7 +2366,7 @@ function ReadConfig($input, $is_include=FALSE)
 
 				$this->colours[$matches[1]][$key]['key']=$key;
 
-				$tag = $matches[11];				
+				$tag = $matches[11];
 
 				$this->colours[$matches[1]][$key]['tag']=$tag;
 
@@ -2430,7 +2433,7 @@ function ReadConfig($input, $is_include=FALSE)
 				$linematched++;
 			}
 
-			
+
 			// truetype font definition (actually, we don't really check if it's truetype) - filename + size
 			if (preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i", $buffer, $matches))
 			{
@@ -2492,7 +2495,7 @@ function ReadConfig($input, $is_include=FALSE)
 				$linematched++;
 			}
 
-			
+
 			if (preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches))
 			{
 				$this->kilo=$matches[1];
@@ -2500,14 +2503,14 @@ function ReadConfig($input, $is_include=FALSE)
 				# $this->links['DEFAULT']=$matches[1];
 				$linematched++;
 			}
-			
+
 			if (preg_match(
 				"/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
 				$buffer,
 				$matches))
 			{
 				$key=$matches[1];
-								
+
 				# "Found colour line for $key\n";
 				$this->colours['DEFAULT'][$key]['red1']=$matches[2];
 				$this->colours['DEFAULT'][$key]['green1']=$matches[3];
@@ -2539,7 +2542,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$curnode->$field=array(-1,-1,-1);
 					$linematched++;
 				}
-				
+
 				if($val == 'contrast' && $matches[1]=='LABELFONT')
 				{
 					$curnode->$field=array(-3,-3,-3);
@@ -2567,14 +2570,14 @@ function ReadConfig($input, $is_include=FALSE)
 					$curlink->$field=array(	$matches[3],$matches[4],$matches[5]);
 					$linematched++;
 				}
-				
+
 				if($val == 'none' && ($key=='BWBOX' || $key=='BWOUTLINE' || $key=='OUTLINE'))
 				{
 					// print "***********************************\n";
 					$curlink->$field=array(-1,-1,-1);
 					$linematched++;
 				}
-				
+
 				if($val == 'contrast' && $key=='COMMENTFONT')
 				{
 					// print "***********************************\n";
@@ -2589,7 +2592,7 @@ function ReadConfig($input, $is_include=FALSE)
 				$curlink->arrowstyle=$matches[1] . ' ' . $matches[2];
 				$linematched++;
 			}
-			
+
 
 			if ($linematched == 0 && trim($buffer) != '') { wm_warn
 				("Unrecognised config on line $linecount: $buffer\n"); }
@@ -2610,7 +2613,7 @@ function ReadConfig($input, $is_include=FALSE)
 	{
 		$this->nodes[$curnode->name]=$curnode;
 		wm_debug ("Saving Node: " . $curnode->name . "\n");
-		if($curnode->template == 'DEFAULT') $this->node_template_tree[ "DEFAULT" ][]= $curnode->name;	
+		if($curnode->template == 'DEFAULT') $this->node_template_tree[ "DEFAULT" ][]= $curnode->name;
 	}
 
 	if ($last_seen == "LINK")
@@ -2619,13 +2622,13 @@ function ReadConfig($input, $is_include=FALSE)
 		{
 			$this->links[$curlink->name]=$curlink;
 			wm_debug ("Saving Link: " . $curlink->name . "\n");
-			if($curlink->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curlink->name;				
+			if($curlink->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curlink->name;
 		}
 		else { wm_warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
 	}
 	}
-	
-		
+
+
 	wm_debug("ReadConfig has finished reading the config ($linecount lines)\n");
 	wm_debug("------------------------------------------\n");
 
@@ -2656,7 +2659,7 @@ function ReadConfig($input, $is_include=FALSE)
 		$this->add_hint("key_hidezero_DEFAULT",1);
 	}
 	else { wm_debug ("Already have $scalesseen scales, no defaults added.\n"); }
-	
+
 	$this->numscales['DEFAULT']=$scalesseen;
 	$this->configfile="$filename";
 
@@ -2664,7 +2667,7 @@ function ReadConfig($input, $is_include=FALSE)
 	{
 		wm_warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
 	}
-	
+
 	wm_debug("Building cache of z-layers and finalising bandwidth.\n");
 
 // 	$allitems = array_merge($this->links, $this->nodes);
@@ -2678,7 +2681,7 @@ function ReadConfig($input, $is_include=FALSE)
 	{
 		$allitems[] = $link;
 	}
-	
+
 	# foreach ($allitems as &$item)
 	foreach ($allitems as $ky=>$vl)
 	{
@@ -2689,7 +2692,7 @@ function ReadConfig($input, $is_include=FALSE)
 			$this->seen_zlayers[$z]=array();
 		}
 		array_push($this->seen_zlayers[$z], $item);
-		
+
 		// while we're looping through, let's set the real bandwidths
 		if($item->my_type() == "LINK")
 		{
@@ -2707,8 +2710,8 @@ function ReadConfig($input, $is_include=FALSE)
 		}
 		// $item->max_bandwidth_in=unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
 		// $item->max_bandwidth_out=unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
-		
-		wm_debug (sprintf("   Setting bandwidth on ".$item->my_type()." $item->name (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $item->max_bandwidth_in_cfg, $item->max_bandwidth_in, $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));		
+
+		wm_debug (sprintf("   Setting bandwidth on ".$item->my_type()." $item->name (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $item->max_bandwidth_in_cfg, $item->max_bandwidth_in, $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));
 	}
 
 	wm_debug("Found ".sizeof($this->seen_zlayers)." z-layers including builtins (0,100).\n");
@@ -2729,7 +2732,7 @@ function ReadConfig($input, $is_include=FALSE)
 				wm_debug("Resolving relative position for NODE ".$node->name." to ".$node->relative_to."\n");
 				if(array_key_exists($node->relative_to,$this->nodes))
 				{
-					
+
 					// check if we are relative to another node which is in turn relative to something
 					// we need to resolve that one before we can resolve this one!
 					if(  ($this->nodes[$node->relative_to]->relative_to != '') && (!$this->nodes[$node->relative_to]->relative_resolved) )
@@ -2741,7 +2744,7 @@ function ReadConfig($input, $is_include=FALSE)
 					{
 						$rx = $this->nodes[$node->relative_to]->x;
 						$ry = $this->nodes[$node->relative_to]->y;
-						
+
 						if($node->polar)
 						{
 							// treat this one as a POLAR relative coordinate.
@@ -2758,10 +2761,10 @@ function ReadConfig($input, $is_include=FALSE)
 						}
 						else
 						{
-							
+
 							// save the relative coords, so that WriteConfig can work
 							// resolve the relative stuff
-	
+
 							$newpos_x = $rx + $this->nodes[$node->name]->x;
 							$newpos_y = $ry + $this->nodes[$node->name]->y;
 							wm_debug("->$newpos_x,$newpos_y\n");
@@ -2804,7 +2807,7 @@ function ReadConfig($input, $is_include=FALSE)
 function ReadConfig_Commit(&$curobj)
 {
 	if(is_null($curobj)) return;
-	
+
 	$last_seen = $curobj->my_type();
 
 	// first, save the previous item, before starting work on the new one
@@ -2827,7 +2830,7 @@ function ReadConfig_Commit(&$curobj)
 			$this->links[$curobj->name]=$curobj;
 			wm_debug ("Saving Template-Only Link: " . $curobj->name . "\n");
 		}
-		if($curobj->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curobj->name;				
+		if($curobj->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curobj->name;
 	}
 }
 
@@ -2893,12 +2896,12 @@ function WriteConfig($filename)
 			|| ($this->mintimey != $this->inherit_fieldlist['mintimey'])
 			|| ($this->minstamptext != $this->inherit_fieldlist['minstamptext']))
 				$output.="MINTIMEPOS " . $this->mintimex . " " . $this->mintimey . " " . $this->minstamptext . "\n";
-		
+
 		if (($this->maxtimex != $this->inherit_fieldlist['maxtimex'])
 			|| ($this->maxtimey != $this->inherit_fieldlist['maxtimey'])
 			|| ($this->maxstamptext != $this->inherit_fieldlist['maxstamptext']))
 				$output.="MAXTIMEPOS " . $this->maxtimex . " " . $this->maxtimey . " " . $this->maxstamptext . "\n";
-						
+
 		if (($this->titlex != $this->inherit_fieldlist['titlex'])
 			|| ($this->titley != $this->inherit_fieldlist['titley']))
 				$output.="TITLEPOS " . $this->titlex . " " . $this->titley . "\n";
@@ -2980,7 +2983,7 @@ function WriteConfig($filename)
 		{
 			$output .= "SET $hintname $hint\n";
 		}
-		
+
 		// this doesn't really work right, but let's try anyway
 		if($this->has_includes)
 		{
@@ -3004,7 +3007,7 @@ function WriteConfig($filename)
 		{
 			if($which == "template") fwrite($fd,"\n# TEMPLATE-only NODEs:\n");
 			if($which == "normal") fwrite($fd,"\n# regular NODEs:\n");
-			
+
 			foreach ($this->nodes as $node)
 			{
 				if(!preg_match("/^::\s/",$node->name))
@@ -3017,10 +3020,10 @@ function WriteConfig($filename)
 					}
 				}
 			}
-			
+
 			if($which == "template") fwrite($fd,"\n# TEMPLATE-only LINKs:\n");
 			if($which == "normal") fwrite($fd,"\n# regular LINKs:\n");
-			
+
 			foreach ($this->links as $link)
 			{
 				if(!preg_match("/^::\s/",$link->name))
@@ -3032,7 +3035,7 @@ function WriteConfig($filename)
 					}
 				}
 			}
-		}		
+		}
 
 		fwrite($fd, "\n\n# That's All Folks!\n");
 
@@ -3065,7 +3068,7 @@ function AllocateScaleColours($im,$refname='gdref1')
 				$b=$colour['blue1'];
 				wm_debug ("AllocateScaleColours: $scalename/$refname $key ($r,$g,$b)\n");
 				$this->colours[$scalename][$key][$refname]=myimagecolorallocate($im, $r, $g, $b);
-			}			
+			}
 		}
 	}
 }
@@ -3161,7 +3164,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			wm_debug("Pre-rendering ".$node->name." to get bounding boxes.\n");
 			if(!is_null($node->x)) $this->nodes[$node->name]->pre_render($image, $this);
 		}
-		
+
 		$all_layers = array_keys($this->seen_zlayers);
 		sort($all_layers);
 
@@ -3194,7 +3197,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				}
 				$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);
 			}
-			
+
 			if(is_array($z_items))
 			{
 				foreach($z_items as $it)
@@ -3231,21 +3234,21 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 								}
 								wm_debug("Added $ii bounding boxes too\n");
 							}
-						}						
+						}
 					}
 				}
 			}
 		}
 
 		$overlay = myimagecolorallocate($image, 200, 0, 0);
-		
+
 		// for the editor, we can optionally overlay some other stuff
         if($this->context == 'editor')
         {
 		if($use_rel_overlay)
 		{
 		#		$overlay = myimagecolorallocate($image, 200, 0, 0);
-		
+
 			// first, we can show relatively positioned NODEs
 			foreach ($this->nodes as $node) {
 					if($node->relative_to != '')
@@ -3256,13 +3259,13 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 									15,15,0,360,$overlay);
 							imagearc($image,$node->x, $node->y,
 									16,16,0,360,$overlay);
-		
+
 							imageline($image,$node->x, $node->y,
 									$rel_x, $rel_y, $overlay);
 					}
 			}
 		}
-		
+
 		if($use_via_overlay)
 		{
 			// then overlay VIAs, so they can be seen
@@ -3276,7 +3279,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 						$y = $this->nodes[$via[2]]->y + $via[1];
 					}
 					else
-					{	
+					{
 						$x = $via[0];
 						$y = $via[1];
 					}
@@ -3288,7 +3291,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
         }
 
 		#$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);
-		
+
 #	$this->myimagestring($image, 30, 100, 100, "Test 1\nLine 2", $overlay,0);
 		#$this->myimagestring($image, 30, 200, 200, "Test 1\nLine 2", $overlay,45);
 
@@ -3364,8 +3367,8 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 					$this->width, $this->height);
 				$result = imagepng($imagethumb, $thumbnailfile);
 				imagedestroy($imagethumb);
-				
-				
+
+
 
 				if(($result==FALSE))
 				{
@@ -3435,14 +3438,16 @@ function PreloadMapHTML()
 		$allitems = array(&$this->nodes, &$this->links);
 		reset($allitems);
 
-		while( list($kk,) = each($allitems))
+		// while( list($kk,) = each($allitems))
+    foreach (array_keys($allitems) as $kk)
 		{
 			unset($objects);
 			# $objects = &$this->links;
 			$objects = &$allitems[$kk];
 
 			reset($objects);
-			while (list($k,) = each($objects))
+			// while (list($k,) = each($objects))
+      foreach (array_keys($objects) as $k)
 			{
 				unset($myobj);
 				$myobj = &$objects[$k];
@@ -3454,7 +3459,7 @@ function PreloadMapHTML()
 				//print "\n\nConsidering a $type - ".$myobj->name.".\n";
 				if($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
 				if($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
-				
+
 				// check to see if any of the relevant things have a value
 				$change = "";
 				foreach ($dirs as $d=>$parts)
@@ -3463,7 +3468,7 @@ function PreloadMapHTML()
 					$change .= join('',$myobj->overliburl[$d]);
 					$change .= $myobj->notestext[$d];
 				}
-				
+
 				if ($this->htmlstyle == "overlib")
 				{
 					//print "CHANGE: $change\n";
@@ -3493,7 +3498,7 @@ function PreloadMapHTML()
 						}
 						$left=""; $above="";
 						$img_extra = "";
-					
+
 						if ($myobj->overlibwidth != 0)
 						{
 							$left="WIDTH," . $myobj->overlibwidth . ",";
@@ -3501,7 +3506,7 @@ function PreloadMapHTML()
 
 							if ($mid_x > $center_x) $left.="LEFT,";
 						}
-						
+
 						if ($myobj->overlibheight != 0)
 						{
 							$above="HEIGHT," . $myobj->overlibheight . ",";
@@ -3509,7 +3514,7 @@ function PreloadMapHTML()
 
 							if ($mid_y > $center_y) $above.="ABOVE,";
 						}
-						
+
 						foreach ($dirs as $dir=>$parts)
 						{
 							$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
@@ -3541,18 +3546,18 @@ function PreloadMapHTML()
 							}
 							$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
 							. "');\"  onmouseout=\"return nd();\"";
-							
+
 							foreach ($parts as $part)
 							{
 								$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
 								//print "INFOURL for $areaname - ";
-							
+
 								$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
 							}
-						}			
+						}
 					} // if change
 				} // overlib?
-				
+
 				// now look at inforurls
 				foreach ($dirs as $dir=>$parts)
 				{
@@ -3561,7 +3566,7 @@ function PreloadMapHTML()
 						# $areaname = $type.":" . $myobj->name . ":" . $part;
 						$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
 						//print "INFOURL for $areaname - ";
-												
+
 						if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
 							$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
 							//print "Setting.\n";
@@ -3572,10 +3577,10 @@ function PreloadMapHTML()
 						}
 					}
 				}
-			
+
 			}
 		}
-	
+
 }
 
 function asJS()
@@ -3612,7 +3617,7 @@ function asJSON()
 	}
 	$json = rtrim($json,", \n");
 	$json .= "\n},\n";
-	
+
 	$json .= "\"nodes\": {\n";
 	$json .= $this->defaultnode->asJSON();
 	foreach ($this->nodes as $node) { $json .= $node->asJSON(); }
@@ -3653,25 +3658,25 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	$html='';
 
 	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
-	if ( $this->imageuri != '') { 
+	if ( $this->imageuri != '') {
 		$html.=sprintf(
 			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
 			$this->imageuri,
 			$this->width,
 			$this->height,
 			$imagemapname
-		); 
+		);
 		//$html .=  'alt="network weathermap" ';
 		$html .= '/>';
 		}
-	else { 
+	else {
 		$html.=sprintf(
 			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
 			$this->imagefile,
 			$this->width,
 			$this->height,
 			$imagemapname
-		); 
+		);
 		//$html .=  'alt="network weathermap" ';
 		$html .= '/>';
 	}
@@ -3738,8 +3743,8 @@ function SortedImagemap($imagemapname)
 // ALWAYS deletes files in the cache folder older than $agelimit, also!
 function CacheUpdate($agelimit=600)
 {
-	global $weathermap_lazycounter; 
-	
+	global $weathermap_lazycounter;
+
 	$cachefolder = $this->cachefolder;
 	$configchanged = filemtime($this->configfile );
 	// make a unique, but safe, prefix for all cachefiles related to this map config
@@ -3798,19 +3803,19 @@ function CacheUpdate($agelimit=600)
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
-		
+
 		$json = "";
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_tree.json","w");
 		$id = 10;	// first ID for user-supplied thing
-		
+
 		$json .= "{ id: 1, text: 'SCALEs'\n, children: [\n";
 		foreach ($this->colours as $scalename=>$colours)
 		{
-			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . ", leaf: true }, \n";			
+			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . ", leaf: true }, \n";
 		}
 		$json = rtrim($json,", \n");
 		$json .= "]},\n";
-		
+
 		$json .= "{ id: 2, text: 'FONTs',\n children: [\n";
 		foreach ($this->fonts as $fontnumber => $font)
 		{
@@ -3821,19 +3826,19 @@ function CacheUpdate($agelimit=600)
 				$json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++, js_escape("Font $fontnumber (GD)"));
 		}
 		$json = rtrim($json,", \n");
-		$json .= "]},\n";		
-		
+		$json .= "]},\n";
+
 		$json .= "{ id: 3, text: 'NODEs',\n children: [\n";
 		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
-		
+
 		$weathemap_lazycounter = $id;
 		// pass the list of subordinate nodes to the recursive tree function
 		$json .= $this->MakeTemplateTree( $this->node_template_tree );
 		$id = $weathermap_lazycounter;
-		
-		$json = rtrim($json,", \n");		
+
+		$json = rtrim($json,", \n");
 		$json .= "]} ]},\n";
-		
+
 		$json .= "{ id: 4, text: 'LINKs',\n children: [\n";
 		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
 		$weathemap_lazycounter = $id;
@@ -3841,10 +3846,10 @@ function CacheUpdate($agelimit=600)
 		$id = $weathermap_lazycounter;
 		$json = rtrim($json,", \n");
 		$json .= "]} ]}\n";
-				
+
 		fputs($fd,"[". $json . "]");
 		fclose($fd);
-		
+
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json","w");
 		$json = "";
 //		$json = $this->defaultnode->asJSON(TRUE);
@@ -3905,11 +3910,11 @@ function CacheUpdate($agelimit=600)
 function MakeTemplateTree( &$tree_list, $startpoint="DEFAULT")
 {
 	global $weathermap_lazycounter;
-	 
+
 	$output = "";
 	foreach ($tree_list[$startpoint] as $subnode)
 	{
-		$output .= "{ id: " . $weathermap_lazycounter++ . ", text: " . js_escape($subnode); 
+		$output .= "{ id: " . $weathermap_lazycounter++ . ", text: " . js_escape($subnode);
 		if( isset($tree_list[$subnode]))
 		{
 			$output .= ", children: [ \n";
@@ -3923,7 +3928,7 @@ function MakeTemplateTree( &$tree_list, $startpoint="DEFAULT")
 		}
 		$output .= "}, \n";
 	}
-	
+
 	return($output);
 }
 
@@ -3934,7 +3939,7 @@ function DumpStats($filename="")
 	{
 		$report .= sprintf("%70s => %d\n",$key,$val);
 	}
-	
+
 	if($filename == "") print $report;
 }
 
