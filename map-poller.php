@@ -29,7 +29,7 @@ $weathermap_url = '/weathermap/';
 
 chdir(dirname($argv[0]));
 
-if (php_sapi_name() == 'cli') { 
+if (php_sapi_name() == 'cli') {
 
 $options = getopt("d");
 
@@ -49,16 +49,8 @@ if (isset($options['d']))
 #  ini_set('error_reporting', 0);
 }
 
-
-if (is_file("../../includes/sql-config.inc.php")) {
-	// For new versions
-	include("../../includes/sql-config.inc.php");
-} else {
-	include("../../includes/defaults.inc.php");
-	include("../../config.php");
-	include("../../includes/functions.inc.php");
-	include("../../includes/definitions.inc.php");
-}
+// at least starting from observium 01/10/2023
+include("../../includes/observium.inc.php");
 include("../../includes/polling/functions.inc.php");
 
 $cli = TRUE;
@@ -79,7 +71,7 @@ if(is_dir($conf_dir)) {
 					$cmd = "php ./weathermap --config $conf_dir/$file --base-href $weathermap_url";
 					if ($debug) { echo "Running $cmd\n"; }
 				}
-				$fp = popen($cmd, 'r'); 
+				$fp = popen($cmd, 'r');
 				$read = fread($fp, 1024);
 				echo $read;
 				pclose($fp);
