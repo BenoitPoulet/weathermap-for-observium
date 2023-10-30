@@ -1,7 +1,10 @@
+######## This fork has been done to work with PHP 7.4 and Observium from 2023 ########
+# The code has been fixed , but the code is ugly and I think it’s not working with LibreNMS anymore
+
 1. Install the Weathermap in the Observium / LibreNMS folder
 
 ```
-    cd /opt/observium/html 
+    cd /opt/observium/html
     git clone https://github.com/ZerxXxes/weathermap-for-observium.git weathermap
 ```
 
