@@ -43,7 +43,7 @@ if( isset($config) )
 }
 
 // check if the goalposts have moved
-if( is_dir($observium_base) && file_exists($observium_base."/config.php") )
+if( is_dir($observium_base) && file_exists($observium_base."includes/observium.inc.php") )
 {
 	// include the cacti-config, so we know about the database
 	// include_once($observium_base."/config.php");
@@ -52,14 +52,14 @@ if( is_dir($observium_base) && file_exists($observium_base."/config.php") )
 	//include_once($observium_base."/includes/functions.php");
 	//include_once($observium_base."html/includes/functions.inc.php");
 	//include_once($observium_base."html/includes/authenticate.inc.php");
-	include_once($observium_base."html/includes/observium.inc.php");
+	// include_once($observium_base."includes/observium.inc.php");
 	//$config['base_url'] = $cacti_url;
 	$observium_found = TRUE;
-        if($config['project_name'] == 'LibreNMS') {
-                $whats_installed = 'LibreNMS';
-        } else {
+        // if($config['project_name'] == 'LibreNMS') {
+        //         $whats_installed = 'LibreNMS';
+        // } else {
                 $whats_installed = 'Observium';
-        }
+        // }
 }
 else
 {
@@ -103,9 +103,8 @@ if(!wm_module_checks())
 }
 
 if(isset($_REQUEST['action'])) { $action = $_REQUEST['action']; }
-if(isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname'];  $mapname = wm_editor_sanitize_conffile($mapname); }
+if(isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname']; $mapname = wm_editor_sanitize_conffile($mapname); }
 if(isset($_REQUEST['selected'])) { $selected = wm_editor_sanitize_selected($_REQUEST['selected']); }
-
 $weathermap_debugging=FALSE;
 
 if($mapname == '')
